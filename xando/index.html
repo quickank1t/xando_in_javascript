@@ -1,0 +1,525 @@
+<HTML>
+    <HEAD>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/bootstrap-theme.min.css" rel="stylesheet"> 
+        
+        <SCRIPT>
+        function loadGame(){
+            paper = new Array(0,0,0,0,0,0,0,0,0);
+        }
+        
+        // ========================================================== DISPLAY STUUF
+        
+        function bluePrint(){
+            var display="";
+            for(var i=0;i<9;i++){
+                display+=paper[i];
+                if((i+1)%3 == 0){
+                    display+="\n";
+                }
+            }
+            printthis(display);
+        }
+
+        function printthis(x){
+            //alert(x);
+        }
+
+        function highlightthis(x){
+            var image = x.src;
+            var blank = getBlank();
+            //printthis(image);
+            if(image == blank){
+                x.src="images/highlight.png";
+            }
+        }
+        
+        function newgame(){
+            location.reload();
+        }
+
+        function normal(x){
+            x.src="images/blank.png";
+        }
+
+        function none(){
+            printthis();
+        }
+
+        function change(x){
+            if(checkIfValidMove(x)){
+                //printthis(x.id);
+                bluePrint();
+                paper[x.id-1]=1;
+                x.src="images/x.png";
+                disableToggel(x);
+                checkifwon(1);//check if user won
+                bluePrint();
+                playmove(); 
+                checkifwon(2);//check if bot won
+            }
+
+        }
+        
+        function setboxvalue(x){
+            x.height = "42";
+            x.width = "42";
+        }
+
+        function sethorizontalvalue(x){
+            x.height = "50";
+            x.width = "5";
+        }
+        
+        function setverticallinevalue(x){
+            x.height = "5";
+            x.width = "155";
+        }
+
+        function disableToggel(x){
+            x.onmouseover="";
+            x.onmouseout="";
+        }   
+
+        function getBlank(){
+            return document.getElementById("blank").value;
+        }
+
+        function getHightlight(){
+            return document.getElementById("highlight").value;
+        }
+        
+        function checkIfValidMove(x){
+            var image = x.src;
+            //printthis(image);
+            var blank =  getHightlight();
+            if( image == blank){
+                return true;
+            }
+            return false;
+
+        }
+        
+        function disableall(x){
+            document.getElementById(x).onmouseover="";
+            document.getElementById(x).onmouseout="";
+        }
+        
+        function displayMessage(x){
+            document.getElementById('demotivatingmessage').innerHTML=x;
+        }
+        // ========================================================== DISPLAY STUUF
+        
+        // ========================================================== BOT 
+        
+        function playmove(){
+            //printthis("inplaymove loop");
+            if(checkforspace()){
+                if(checkcenterspace()){ //if center is empty put o at center
+                    if(checkIfwinning(2,1)){ //check if the bot can win
+                        if(checkIfwinning(1,2)){ // check if the user is wiinng if so block it
+                            if(smartFunction()){
+                                printthis("randoming a place");
+                                randomMove(); 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        function checkcenterspace(){
+            //printthis(document.getElementById("5").src);
+            printthis("center chekr");
+            var blank = getBlank();
+            //printthis(blank);
+            var blank2check = document.getElementById("5").src;
+            //printthis(blank2check);
+            if(blank == blank2check){
+                //printthis("yes");
+                setOAt(4);
+                bluePrint();
+                displayMessage("Bot: Not a good move!");
+                return false;
+            }
+            return true;
+        }
+        
+        function setOAt(x){
+            document.getElementById(x+1).src="images/o.png";
+            document.getElementById(x+1).onmouseover="";
+            document.getElementById(x+1).onmouseout="";
+            setOinpaper(x);
+        }
+        
+        function setOinpaper(x){
+            paper[x]=2;
+        }
+        
+        function tryAddingAtPosition(c){
+        if(paper[c] == 0){
+             paper[c] = 2;
+             setOAt(c);
+             return false;
+        }
+        return true;
+    }
+        
+        function randomMove(){
+            
+            while(checkforspace()){
+                var preferdmove = [0,2,6,8];
+                var nonpreferd= [1,3,5,7];
+                preferdmove =shuffle(preferdmove);
+                nonpreferd = shuffle(nonpreferd);
+                var tocontinue= true;
+                var i=0;
+                while(tocontinue){
+                    tocontinue = tryAddingAtPosition(preferdmove[i]);
+                    
+                    i++;
+                    if(i == preferdmove.length-1 || tocontinue == false){
+                        break;
+                    }
+                }
+                i=0;
+                while(tocontinue){
+                    tocontinue = tryAddingAtPosition(nonpreferd[i]);
+                    i++;
+                }
+                if(i == nonpreferd.length - 1 || tocontinue == false){
+                        break;
+                }
+            }
+        }
+        
+        function checkforspace(){
+            for(var i=0;i<9;i++){
+                if(paper[i] == 0){
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        function  shuffle(a) {
+        var j, x, i;
+        for (i = a.length; i; i--) {
+            j = Math.floor(Math.random() * i);
+            x = a[i - 1];
+            a[i - 1] = a[j];
+            a[j] = x;
+        }
+        return a;
+    }
+        
+        function checkIfwinning(x,y){
+            var changed= false;
+            var num = x;
+            if(paper[0] == num && paper[1] == num )  {
+            if(!tryAddingAtPosition(2)){
+                 return false;
+            }  
+        }else if(paper[0] == num && paper[2] == num){
+            if(!tryAddingAtPosition(1)){
+                return false;
+            }
+        }else if(paper[2] == num && paper[1] == num){
+            if(!tryAddingAtPosition(0)){
+                return false;
+            }
+        }
+        if(paper[3] == num && paper[4] == num){
+             if(!tryAddingAtPosition(5)){
+                return false;
+             }
+        }else if(paper[5] == num && paper[3] == num){
+             if(!tryAddingAtPosition(4)){
+                 return false; 
+             }
+        }else if(paper[4] == num && paper[5] == num){
+            if(!tryAddingAtPosition(3)){
+                 return false; 
+             }
+        }
+        
+        if(paper[6] == num && paper[7] == num){
+            if(!tryAddingAtPosition(8)){
+                 return false; 
+             }
+        }else if(paper[8] == num && paper[6] == num){
+            if(!tryAddingAtPosition(7)){
+                 return false; 
+             }
+        }else if(paper[7] == num && paper[8] == num){
+            if(!tryAddingAtPosition(6)){
+                 return false; 
+             }
+        }
+        
+        if(!changed){
+            if(paper[0] == num && paper[3] == num){
+            if(!tryAddingAtPosition(6)){
+                 return false; 
+             }
+            }else if(paper[0] == num && paper[6] == num){
+                if(!tryAddingAtPosition(3)){
+                     return false; 
+                 }
+            }else if(paper[3] == num && paper[6] == num){
+                if(!tryAddingAtPosition(0)){
+                     return false; 
+                 }
+            }
+
+            if(paper[1] == num && paper[4] == num){
+                if(!tryAddingAtPosition(7)){
+                     return false; 
+                 }
+            }else if(paper[7] == num && paper[1] == num){
+                if(!tryAddingAtPosition(4)){
+                     return false; 
+                 }
+            }else if(paper[4] == num && paper[7] == num){
+                if(!tryAddingAtPosition(1)){
+                     return false; 
+                 }
+            }
+
+            if(paper[5] == num && paper[8] == num){
+                if(!tryAddingAtPosition(2)){
+                     return false; 
+                 }
+            }else if(paper[2] == num && paper[5] == num){
+                if(!tryAddingAtPosition(8)){
+                     return false; 
+                 }
+            }else if(paper[2] == num && paper[8] == num){
+                if(!tryAddingAtPosition(5)){
+                     return false; 
+                 }
+            }
+        }
+        
+        if(!changed){
+            if(paper[0] == num && paper[4] == num){
+            if(!tryAddingAtPosition(8)){
+                 return false; 
+             }
+            }else if(paper[0] == num && paper[8] == num){
+                if(!tryAddingAtPosition(4)){
+                     return false; 
+                 }
+            }else if(paper[4] == num && paper[8] == num){
+                if(!tryAddingAtPosition(0)){
+                     return false; 
+                 }
+            }
+
+            if(paper[4] == num && paper[6] == num){
+                if(!tryAddingAtPosition(2)){
+                     return false; 
+                 }
+            }else if(paper[2] == num && paper[4] == num){
+                if(!tryAddingAtPosition(6)){
+                     return false; 
+                 }
+            }else if(paper[2] == num && paper[6] == num){
+                if(!tryAddingAtPosition(4)){
+                     return false; 
+                 }
+            }
+        }
+        return true;
+        }
+        
+        function checkifwon(num){
+            var won= false;
+            if(paper[0] == num && paper[1] == num && paper[2] == num  ){
+                won=true;
+            }else if(paper[3] == num && paper[4] == num && paper[5] == num ){
+                won=true;
+            }else if(paper[6] == num && paper[7] == num && paper[8] == num ){
+                won=true;
+            }else if(paper[0] == num && paper[3] == num && paper[6] == num ){
+                won=true;
+            }else if(paper[1] == num && paper[4] == num && paper[7] == num ){
+                won=true;
+            }else if(paper[2] == num && paper[5] == num && paper[8] == num ){
+                won=true;
+            }else if(paper[0] == num && paper[4] == num && paper[8] == num ){
+                won=true;
+            }else if(paper[2] == num && paper[4] == num && paper[6] == num ){
+                won=true;
+            }
+            if(won){
+                if(num == 2){
+                    alert("PREDICTABLE OUTCOME!!. bot win");
+                }else{
+                    alert("You have done the immposible!! congratz you won")
+                }
+                
+                for(var i=1;i<10;i++){
+                    disableall(i);
+                }
+            }
+        }
+        
+        function smartFunction(){
+            num=1;
+            if(paper[1] == num && paper[5] == num )  {
+                if(!tryAddingAtPosition(2)){                 
+                     return false;
+                }  
+            }else if(paper[1] == num && paper[3] == num){
+                if(!tryAddingAtPosition(0)){
+                    return false;
+                }
+            }else if(paper[3] == num && paper[7] == num){
+                if(!tryAddingAtPosition(6)){
+                    return false;
+                }
+            }else if(paper[7] == num && paper[5] == num){
+                if(!tryAddingAtPosition(8)){
+                    return false;
+                }
+            }
+
+            if(paper[0] == num && paper[8] == num){
+                var moves = [7,3,1,5];
+                moves = shuffle(moves);
+                var i=0;
+                while(true){
+                    if(!tryAddingAtPosition(moves[i])){
+                        return false;
+                    }
+                    i++;
+                }
+            }
+        
+            if(paper[6] == num && paper[2] == num){
+                var moves = [7,3,1,5];
+                moves = shuffle(moves);
+                var i=0;
+                while(true){
+                    if(!tryAddingAtPosition(moves[i])){
+                        return false;
+                    }
+                    i++;
+                }
+            }
+            
+            if(chekifitssecondturnofbot()){
+                if(paper[1] == num && paper[8] == num || paper[1] == num && paper[6] == num ){
+                    var moves = [2,3,5,0];
+                    moves = shuffle(moves);
+                    var i=0;
+                    while(true){
+                        if(!tryAddingAtPosition(moves[i])){
+                            return false;
+                        }
+                        i++;
+                    }
+                }
+                
+                if(paper[3] == num && paper[8] == num || paper[3] == num && paper[2] == num ){
+                    var moves = [0,1,6,7];
+                    moves = shuffle(moves);
+                    var i=0;
+                    while(true){
+                        if(!tryAddingAtPosition(moves[i])){
+                            return false;
+                        }
+                        i++;
+                    }
+                }
+                
+                if(paper[5] == num && paper[0] == num || paper[5] == num && paper[6] == num ){
+                    var moves = [1,2,7,8];
+                    moves = shuffle(moves);
+                    var i=0;
+                    while(true){
+                        if(!tryAddingAtPosition(moves[i])){
+                            return false;
+                        }
+                        i++;
+                    }
+                }
+                
+                if(paper[7] == num && paper[0] == num || paper[7] == num && paper[2] == num ){
+                    var moves = [3,5,6,8];
+                    moves = shuffle(moves);
+                    var i=0;
+                    while(true){
+                        if(!tryAddingAtPosition(moves[i])){
+                            return false;
+                        }
+                        i++;
+                    }
+                }
+                
+                
+            }
+        return true;
+    }
+    
+    function chekifitssecondturnofbot(){
+        count=0;
+        for(var i=0;i<9;i++){
+            if(i!=0){
+                count++;
+            }
+            if(count == 3){
+                return true;
+            }
+        }
+        return false;
+    }
+        // ========================================================== BOT 
+            
+            
+</SCRIPT>
+    </HEAD>
+    
+    <BODY onload="loadGame()">
+        <input type="hidden" id="blank" value="http://localhost/ankit/xando/images/blank.png" >
+        <input type="hidden" id="highlight" value="http://localhost/ankit/xando/images/highlight.png" >
+        <DIV class="container">
+            
+            <h3><centeR><kbd>A bot that never loses a game!!</KBD></center></h3>
+                
+            
+        </DIV>
+        <BR><Br><BR><BR>
+        <DIV class="container"><CENTER>
+            <img id="1" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)">
+            <img src="images/horizontal.png"  onload="sethorizontalvalue(this)">
+            <img id="2" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)">
+            <img src="images/horizontal.png"  onload="sethorizontalvalue(this)">
+            <img id="3" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)"><br>
+            <img src="images/dot.png"  onload="setverticallinevalue(this)"><br>
+            <img id="4" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)">
+            <img src="images/horizontal.png"  onload="sethorizontalvalue(this)">
+            <img id="5" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)">
+            <img src="images/horizontal.png"  onload="sethorizontalvalue(this)">
+            <img id="6" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)"><br>
+            <img src="images/dot.png"  onload="setverticallinevalue(this)"><br>
+            <img id="7" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)">
+            <img src="images/horizontal.png"  onload="sethorizontalvalue(this)">
+            <img id="8" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)" onmouseover="highlightthis(this)" onmouseout="normal(this)">
+            <img src="images/horizontal.png"  onload="sethorizontalvalue(this)">
+            <img id="9" src="images/blank.png" onload="setboxvalue(this)" onclick="change(this)"    onmouseover="highlightthis(this)" onmouseout="normal(this)"></CENTER>
+        </DIV>
+        <BR><Br><BR><BR> <BR><Br><BR><BR> <BR>
+        <div class="container">
+            <center><button type="button" class="btn btn-default" onclick="newgame()" ><strong>Try again</STRONG></button></center></div>
+        
+        <BR> <BR><Br><BR><BR>
+        <div id="">
+        </div>
+
+        
+    </BODY>
+</HTML>
+
+
