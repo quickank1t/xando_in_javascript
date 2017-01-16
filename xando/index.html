@@ -49,12 +49,12 @@
         function change(x){
             if(checkIfValidMove(x)){
                 //printthis(x.id);
-                bluePrint();
+                //bluePrint();
                 paper[x.id-1]=1;
                 x.src="images/x.png";
                 disableToggel(x);
                 checkifwon(1);//check if user won
-                bluePrint();
+                //bluePrint();
                 playmove(); 
                 checkifwon(2);//check if bot won
             }
@@ -130,7 +130,7 @@
         
         function checkcenterspace(){
             //printthis(document.getElementById("5").src);
-            printthis("center chekr");
+            //printthis("center chekr");
             var blank = getBlank();
             //printthis(blank);
             var blank2check = document.getElementById("5").src;
@@ -138,8 +138,8 @@
             if(blank == blank2check){
                 //printthis("yes");
                 setOAt(4);
-                bluePrint();
-                displayMessage("Bot: Not a good move!");
+                //bluePrint();
+                //displayMessage("Bot: Not a good move!");
                 return false;
             }
             return true;
