@@ -11,6 +11,10 @@ Used artificial intelligence to create a x and o bot that can never lose a game.
 
 Achived the result in 2 day.( 4 hours of commitment perday )
 
+# TIME COMPLEXITY
+
+O(21N)
+
 # LIVE
 
 Thanks to github its live now. <a href="https://quickank1t.github.io/xando/">Demo</a>
