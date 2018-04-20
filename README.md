@@ -13,7 +13,7 @@ Achived the result in 2 day.( 4 hours of commitment perday )
 
 # TIME COMPLEXITY
 
-O(21 x 9)
+O(1)
 
 # LIVE
 
